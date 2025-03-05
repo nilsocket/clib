@@ -26,7 +26,12 @@ func Send(w http.ResponseWriter, data any, err error) {
 
 // SendAsAttachment attaches given `data` as downloadable attachment with given `filename`
 // it supports ranged requests
-func SendAsAttachment(w http.ResponseWriter, r *http.Request, filename string, data io.ReadSeeker) {
+func SendAsAttachment(w http.ResponseWriter, r *http.Request, filename string, data io.ReadSeeker, err error) {
+
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
 
 	w.Header().Set(cconst.HeaderContentDisposition, "attachment; filename="+filename+"\"")
 	http.ServeContent(w, r, filename, time.Now(), data)
