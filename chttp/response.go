@@ -13,15 +13,24 @@ import (
 	"github.com/nilsocket/clib/cconst"
 )
 
+type Response struct {
+	Data  any    `json:"data"`
+	Error string `json:"error,omitempty"`
+}
+
 // Send writes given `data` or `err` to `w` as `json`
 func Send(w http.ResponseWriter, data any, err error) {
 
-	if err != nil {
-		w.Write([]byte(err.Error()))
-		return
+	resp := Response{
+		Data:  data,
+		Error: err.Error(),
 	}
 
-	json.NewEncoder(w).Encode(data)
+	if err != nil {
+		resp.Data = nil
+	}
+
+	json.NewEncoder(w).Encode(resp)
 }
 
 // SendAsAttachment attaches given `data` as downloadable attachment with given `filename`
@@ -29,7 +38,7 @@ func Send(w http.ResponseWriter, data any, err error) {
 func SendAsAttachment(w http.ResponseWriter, r *http.Request, filename string, data io.ReadSeeker, err error) {
 
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		Send(w, nil, err)
 		return
 	}
 
