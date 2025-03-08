@@ -6,6 +6,7 @@ package chttp
 
 import (
 	"encoding/json"
+	"html"
 	"io"
 	"net/http"
 	"time"
@@ -50,6 +51,6 @@ func SendAsAttachment(w http.ResponseWriter, r *http.Request, filename string, d
 		return
 	}
 
-	w.Header().Set(cconst.HeaderContentDisposition, `attachment; filename="`+filename+`"`)
+	w.Header().Set(cconst.HeaderContentDisposition, `attachment; filename*=UTF-8''`+html.EscapeString(filename))
 	http.ServeContent(w, r, filename, time.Now(), data)
 }
